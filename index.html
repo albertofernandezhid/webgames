@@ -210,10 +210,25 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            min-height: 80px;
         }
 
         .tic-cell:hover {
             background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tic-cell.player-x {
+            background: rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+            border-color: #ff6b6b;
+        }
+
+        .tic-cell.player-o {
+            background: rgba(107, 178, 255, 0.3);
+            color: #6bb2ff;
+            border-color: #6bb2ff;
         }
 
         .number-grid {
@@ -636,6 +651,7 @@
                 const cell = document.createElement('div');
                 cell.className = 'tic-cell';
                 cell.dataset.index = i;
+                cell.textContent = '';
                 cell.onclick = () => makeMove(i);
                 grid.appendChild(cell);
             }
@@ -645,7 +661,15 @@
             if (ticBoard[index] !== '' || !gameActive) return;
             
             ticBoard[index] = currentPlayer;
-            document.querySelector(`[data-index="${index}"]`).textContent = currentPlayer;
+            const cell = document.querySelector(`[data-index="${index}"]`);
+            cell.textContent = currentPlayer;
+            
+            // Añadir clase visual para el jugador
+            if (currentPlayer === 'X') {
+                cell.classList.add('player-x');
+            } else {
+                cell.classList.add('player-o');
+            }
             
             if (checkWinner()) {
                 document.getElementById('game-status').textContent = `¡${currentPlayer} gana!`;
@@ -662,7 +686,7 @@
             currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
             document.getElementById('current-player').textContent = currentPlayer;
             
-            if (currentPlayer === 'O') {
+            if (currentPlayer === 'O' && gameActive) {
                 setTimeout(computerMove, 500);
             }
         }
@@ -671,8 +695,9 @@
             if (!gameActive) return;
             
             const emptyCells = ticBoard.map((cell, index) => cell === '' ? index : null).filter(val => val !== null);
-            const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            if (emptyCells.length === 0) return;
             
+            const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
             makeMove(randomIndex);
         }
 
