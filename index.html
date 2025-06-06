@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Juegos Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .game-card h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .game-card p {
+            font-size: 1em;
+            opacity: 0.8;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .play-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .game-container {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-container.active {
+            display: block;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Estilos específicos para cada juego */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .memory-card:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .memory-card.flipped {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+        }
+
+        .snake-canvas {
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 15px 20px;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .score {
+            text-align: center;
+            font-size: 1.3em;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .tic-tac-toe-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        .tic-cell {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tic-cell:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 320px;
+            margin: 20px auto;
+        }
+
+        .number-tile {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .number-tile:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .number-tile.empty {
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .word-input {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+            margin: 10px;
+            width: 200px;
+        }
+
+        .word-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .game-info {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .memory-grid {
+                max-width: 280px;
+            }
+            
+            .control-btn {
+                padding: 10px 15px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Mini Juegos Online</h1>
+            <p>Colección de juegos sencillos para divertirse</p>
+        </div>
+
+        <div id="menu" class="games-grid">
+            <div class="game-card" onclick="showGame('memory')">
+                <h3>🧠 Memoria</h3>
+                <p>Encuentra las parejas de cartas iguales. Entrena tu memoria con este clásico juego.</p>
+                <button class="play-btn">Jugar</button>
+            </div>
+
+            <div class="game-card" onclick="showGame('snake')">
+                <h3>🐍 Snake</h3>
+                <p>Controla la serpiente y come la comida sin chocar. Un clásico atemporal.</p>
+                <button class="play-btn">Jugar</button>
+            </div>
+
+            <div class="game-card" onclick="showGame('tictactoe')">
+                <h3>❌ Tres en Raya</h3>
+                <p>Juega contra la computadora en este juego de estrategia clásico.</p>
+                <button class="play-btn">Jugar</button>
+            </div>
+
+            <div class="game-card" onclick="showGame('puzzle')">
+                <h3>🧩 Rompecabezas 15</h3>
+                <p>Ordena los números del 1 al 15 deslizando las fichas.</p>
+                <button class="play-btn">Jugar</button>
+            </div>
+
+            <div class="game-card" onclick="showGame('word')">
+                <h3>📝 Adivina la Palabra</h3>
+                <p>Adivina la palabra secreta con las pistas que te damos.</p>
+                <button class="play-btn">Jugar</button>
+            </div>
+
+            <div class="game-card" onclick="showGame('reaction')">
+                <h3>⚡ Tiempo de Reacción</h3>
+                <p>Pon a prueba tus reflejos. ¿Qué tan rápido puedes reaccionar?</p>
+                <button class="play-btn">Jugar</button>
+            </div>
+        </div>
+
+        <!-- Juego de Memoria -->
+        <div id="memory-game" class="game-container">
+            <button class="back-btn" onclick="showMenu()">← Volver al menú</button>
+            <h2 style="text-align: center; margin-bottom: 20px;">🧠 Juego de Memoria</h2>
+            <div class="score">Movimientos: <span id="memory-moves">0</span> | Parejas: <span id="memory-pairs">0</span>/8</div>
+            <div id="memory-grid" class="memory-grid"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="play-btn" onclick="initMemoryGame()">Nueva Partida</button>
+            </div>
+        </div>
+
+        <!-- Juego Snake -->
+        <div id="snake-game" class="game-container">
+            <button class="back-btn" onclick="showMenu()">← Volver al menú</button>
+            <h2 style="text-align: center; margin-bottom: 20px;">🐍 Snake</h2>
+            <div class="score">Puntuación: <span id="snake-score">0</span></div>
+            <div style="text-align: center;">
+                <canvas id="snake-canvas" class="snake-canvas" width="400" height="400"></canvas>
+            </div>
+            <div class="controls">
+                <div>
+                    <button class="control-btn" onclick="changeDirection('up')">↑</button>
+                </div>
+                <div>
+                    <button class="control-btn" onclick="changeDirection('left')">←</button>
+                    <button class="control-btn" onclick="changeDirection('down')">↓</button>
+                    <button class="control-btn" onclick="changeDirection('right')">→</button>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="play-btn" onclick="initSnakeGame()">Nueva Partida</button>
+            </div>
+        </div>
+
+        <!-- Tres en Raya -->
+        <div id="tictactoe-game" class="game-container">
+            <button class="back-btn" onclick="showMenu()">← Volver al menú</button>
+            <h2 style="text-align: center; margin-bottom: 20px;">❌ Tres en Raya</h2>
+            <div class="game-info">Turno del jugador: <span id="current-player">X</span></div>
+            <div id="tic-grid" class="tic-tac-toe-grid"></div>
+            <div class="game-info" id="game-status"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="play-btn" onclick="initTicTacToe()">Nueva Partida</button>
+            </div>
+        </div>
+
+        <!-- Rompecabezas 15 -->
+        <div id="puzzle-game" class="game-container">
+            <button class="back-btn" onclick="showMenu()">← Volver al menú</button>
+            <h2 style="text-align: center; margin-bottom: 20px;">🧩 Rompecabezas 15</h2>
+            <div class="score">Movimientos: <span id="puzzle-moves">0</span></div>
+            <div id="puzzle-grid" class="number-grid"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="play-btn" onclick="initPuzzleGame()">Mezclar</button>
+            </div>
+        </div>
+
+        <!-- Adivina la Palabra -->
+        <div id="word-game" class="game-container">
+            <button class="back-btn" onclick="showMenu()">← Volver al menú</button>
+            <h2 style="text-align: center; margin-bottom: 20px;">📝 Adivina la Palabra</h2>
+            <div class="game-info">Categoría: <span id="word-category"></span></div>
+            <div class="game-info">Pista: <span id="word-hint"></span></div>
+            <div class="game-info">Palabra: <span id="word-display"></span></div>
+            <div style="text-align: center;">
+                <input type="text" id="word-input" class="word-input" placeholder="Tu respuesta..." maxlength="20">
+                <br>
+                <button class="play-btn" onclick="checkWord()" style="margin: 10px;">Comprobar</button>
+                <button class="control-btn" onclick="initWordGame()">Nueva Palabra</button>
+            </div>
+            <div class="game-info" id="word-result"></div>
+        </div>
+
+        <!-- Tiempo de Reacción -->
+        <div id="reaction-game" class="game-container">
+            <button class="back-btn" onclick="showMenu()">← Volver al menú</button>
+            <h2 style="text-align: center; margin-bottom: 20px;">⚡ Tiempo de Reacción</h2>
+            <div style="text-align: center;">
+                <div id="reaction-area" style="width: 300px; height: 200px; margin: 20px auto; border: 3px solid rgba(255,255,255,0.5); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; cursor: pointer; background: rgba(255,255,255,0.1);">
+                    Haz clic para empezar
+                </div>
+                <div class="game-info" id="reaction-result"></div>
+                <button class="play-btn" onclick="initReactionGame()">Nuevo Test</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentGame = null;
+
+        // Función para mostrar/ocultar juegos
+        function showGame(game) {
+            document.getElementById('menu').style.display = 'none';
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.getElementById(game + '-game').classList.add('active');
+            currentGame = game;
+            
+            // Inicializar el juego específico
+            switch(game) {
+                case 'memory': initMemoryGame(); break;
+                case 'snake': initSnakeGame(); break;
+                case 'tictactoe': initTicTacToe(); break;
+                case 'puzzle': initPuzzleGame(); break;
+                case 'word': initWordGame(); break;
+                case 'reaction': initReactionGame(); break;
+            }
+        }
+
+        function showMenu() {
+            document.getElementById('menu').style.display = 'grid';
+            document.querySelectorAll('.game-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            currentGame = null;
+        }
+
+        // JUEGO DE MEMORIA
+        let memoryCards = [];
+        let flippedCards = [];
+        let moves = 0;
+        let pairs = 0;
+
+        function initMemoryGame() {
+            const symbols = ['🎮', '🎯', '🎲', '🎪', '🎨', '🎭', '🎪', '🎸'];
+            memoryCards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+            flippedCards = [];
+            moves = 0;
+            pairs = 0;
+            
+            document.getElementById('memory-moves').textContent = moves;
+            document.getElementById('memory-pairs').textContent = pairs;
+            
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            
+            memoryCards.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.index = index;
+                card.dataset.symbol = symbol;
+                card.onclick = () => flipCard(index);
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(index) {
+            if (flippedCards.length >= 2) return;
+            if (flippedCards.includes(index)) return;
+            
+            const card = document.querySelector(`[data-index="${index}"]`);
+            card.textContent = card.dataset.symbol;
+            card.classList.add('flipped');
+            flippedCards.push(index);
+            
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('memory-moves').textContent = moves;
+                
+                setTimeout(() => {
+                    checkMatch();
+                }, 1000);
+            }
+        }
+
+        function checkMatch() {
+            const [first, second] = flippedCards;
+            const firstCard = document.querySelector(`[data-index="${first}"]`);
+            const secondCard = document.querySelector(`[data-index="${second}"]`);
+            
+            if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+                pairs++;
+                document.getElementById('memory-pairs').textContent = pairs;
+                if (pairs === 8) {
+                    setTimeout(() => alert(`¡Felicidades! Completaste el juego en ${moves} movimientos`), 100);
+                }
+            } else {
+                firstCard.textContent = '';
+                secondCard.textContent = '';
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+            }
+            
+            flippedCards = [];
+        }
+
+        // JUEGO SNAKE
+        let snake = [{x: 200, y: 200}];
+        let food = {x: 0, y: 0};
+        let direction = {x: 0, y: 0};
+        let snakeScore = 0;
+        let gameRunning = false;
+
+        function initSnakeGame() {
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            snake = [{x: 200, y: 200}];
+            direction = {x: 0, y: 0};
+            snakeScore = 0;
+            gameRunning = false;
+            
+            document.getElementById('snake-score').textContent = snakeScore;
+            generateFood();
+            drawGame();
+        }
+
+        function generateFood() {
+            food = {
+                x: Math.floor(Math.random() * 20) * 20,
+                y: Math.floor(Math.random() * 20) * 20
+            };
+        }
+
+        function drawGame() {
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Dibujar serpiente
+            ctx.fillStyle = '#4CAF50';
+            snake.forEach(segment => {
+                ctx.fillRect(segment.x, segment.y, 18, 18);
+            });
+            
+            // Dibujar comida
+            ctx.fillStyle = '#FF5722';
+            ctx.fillRect(food.x, food.y, 18, 18);
+        }
+
+        function moveSnake() {
+            if (!gameRunning) return;
+            
+            const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
+            
+            // Verificar colisiones con paredes
+            if (head.x < 0 || head.x >= 400 || head.y < 0 || head.y >= 400) {
+                gameRunning = false;
+                alert(`Game Over! Puntuación: ${snakeScore}`);
+                return;
+            }
+            
+            // Verificar colisión consigo misma
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                gameRunning = false;
+                alert(`Game Over! Puntuación: ${snakeScore}`);
+                return;
+            }
+            
+            snake.unshift(head);
+            
+            // Verificar si comió
+            if (head.x === food.x && head.y === food.y) {
+                snakeScore += 10;
+                document.getElementById('snake-score').textContent = snakeScore;
+                generateFood();
+            } else {
+                snake.pop();
+            }
+            
+            drawGame();
+        }
+
+        function changeDirection(newDirection) {
+            if (!gameRunning) gameRunning = true;
+            
+            switch(newDirection) {
+                case 'up': if (direction.y === 0) direction = {x: 0, y: -20}; break;
+                case 'down': if (direction.y === 0) direction = {x: 0, y: 20}; break;
+                case 'left': if (direction.x === 0) direction = {x: -20, y: 0}; break;
+                case 'right': if (direction.x === 0) direction = {x: 20, y: 0}; break;
+            }
+        }
+
+        // Game loop para Snake
+        setInterval(moveSnake, 150);
+
+        // TRES EN RAYA
+        let ticBoard = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let gameActive = true;
+
+        function initTicTacToe() {
+            ticBoard = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            gameActive = true;
+            
+            document.getElementById('current-player').textContent = currentPlayer;
+            document.getElementById('game-status').textContent = '';
+            
+            const grid = document.getElementById('tic-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'tic-cell';
+                cell.dataset.index = i;
+                cell.onclick = () => makeMove(i);
+                grid.appendChild(cell);
+            }
+        }
+
+        function makeMove(index) {
+            if (ticBoard[index] !== '' || !gameActive) return;
+            
+            ticBoard[index] = currentPlayer;
+            document.querySelector(`[data-index="${index}"]`).textContent = currentPlayer;
+            
+            if (checkWinner()) {
+                document.getElementById('game-status').textContent = `¡${currentPlayer} gana!`;
+                gameActive = false;
+                return;
+            }
+            
+            if (ticBoard.every(cell => cell !== '')) {
+                document.getElementById('game-status').textContent = '¡Empate!';
+                gameActive = false;
+                return;
+            }
+            
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('current-player').textContent = currentPlayer;
+            
+            if (currentPlayer === 'O') {
+                setTimeout(computerMove, 500);
+            }
+        }
+
+        function computerMove() {
+            if (!gameActive) return;
+            
+            const emptyCells = ticBoard.map((cell, index) => cell === '' ? index : null).filter(val => val !== null);
+            const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            
+            makeMove(randomIndex);
+        }
+
+        function checkWinner() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            
+            return winPatterns.some(pattern => 
+                pattern.every(index => ticBoard[index] === currentPlayer)
+            );
+        }
+
+        // ROMPECABEZAS 15
+        let puzzleBoard = [];
+        let puzzleMoves = 0;
+        let emptyIndex = 15;
+
+        function initPuzzleGame() {
+            puzzleBoard = Array.from({length: 16}, (_, i) => i === 15 ? '' : i + 1);
+            puzzleMoves = 0;
+            emptyIndex = 15;
+            
+            // Mezclar
+            for (let i = 0; i < 1000; i++) {
+                const validMoves = getValidMoves();
+                const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+                swapTiles(emptyIndex, randomMove);
+            }
+            
+            document.getElementById('puzzle-moves').textContent = puzzleMoves = 0;
+            renderPuzzle();
+        }
+
+        function renderPuzzle() {
+            const grid = document.getElementById('puzzle-grid');
+            grid.innerHTML = '';
+            
+            puzzleBoard.forEach((num, index) => {
+                const tile = document.createElement('div');
+                tile.className = num === '' ? 'number-tile empty' : 'number-tile';
+                tile.textContent = num;
+                tile.onclick = () => moveTile(index);
+                grid.appendChild(tile);
+            });
+        }
+
+        function moveTile(index) {
+            if (!getValidMoves().includes(index)) return;
+            
+            swapTiles(emptyIndex, index);
+            puzzleMoves++;
+            document.getElementById('puzzle-moves').textContent = puzzleMoves;
+            renderPuzzle();
+            
+            if (checkPuzzleSolved()) {
+                setTimeout(() => alert(`¡Felicidades! Resolviste el puzzle en ${puzzleMoves} movimientos`), 100);
+            }
+        }
+
+        function swapTiles(index1, index2) {
+            [puzzleBoard[index1], puzzleBoard[index2]] = [puzzleBoard[index2], puzzleBoard[index1]];
+            emptyIndex = emptyIndex === index1 ? index2 : index1;
+        }
+
+        function getValidMoves() {
+            const moves = [];
+            const row = Math.floor(emptyIndex / 4);
+            const col = emptyIndex % 4;
+            
+            if (row > 0) moves.push(emptyIndex - 4);
+            if (row < 3) moves.push(emptyIndex + 4);
+            if (col > 0) moves.push(emptyIndex - 1);
+            if (col < 3) moves.push(emptyIndex + 1);
+            
+            return moves;
+        }
+
+        function checkPuzzleSolved() {
+            return puzzleBoard.every((num, index) => 
+                index === 15 ? num === '' : num === index + 1
+            );
+        }
+
+        // ADIVINA LA PALABRA
+        const words = [
+            {word: 'GATO', hint: 'Animal doméstico que maúlla', category: 'Animales'},
+            {word: 'PIZZA', hint: 'Comida italiana redonda con queso', category: 'Comida'},
+            {word: 'PLAYA', hint: 'Lugar con arena junto al mar', category: 'Lugares'},
+            {word: 'LIBRO', hint: 'Se lee y tiene páginas', category: 'Objetos'},
+            {word: 'MUSICA', hint: 'Arte de combinar sonidos', category: 'Arte'},
+            {word: 'FUTBOL', hint: 'Deporte que se juega con los pies', category: 'Deportes'},
+            {word: 'ESTRELLA', hint: 'Brillan en el cielo nocturno', category: 'Naturaleza'},
+            {word: 'TELEFONO', hint: 'Aparato para hablar a distancia', category: 'Tecnología'},
+            {word: 'CHOCOLATE', hint: 'Dulce de color marrón', category: 'Comida'},
+            {word: 'BICICLETA', hint: 'Vehículo de dos ruedas', category: 'Transporte'}
+        ];
+        
+        let currentWord = {};
+
+        function initWordGame() {
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            
+            document.getElementById('word-category').textContent = currentWord.category;
+            document.getElementById('word-hint').textContent = currentWord.hint;
+            document.getElementById('word-display').textContent = '_ '.repeat(currentWord.word.length);
+            document.getElementById('word-input').value = '';
+            document.getElementById('word-result').textContent = '';
+        }
+
+        function checkWord() {
+            const userInput = document.getElementById('word-input').value.toUpperCase().trim();
+            const resultDiv = document.getElementById('word-result');
+            
+            if (userInput === currentWord.word) {
+                resultDiv.textContent = '¡Correcto! 🎉';
+                resultDiv.style.color = '#4CAF50';
+                setTimeout(() => {
+                    initWordGame();
+                }, 2000);
+            } else {
+                resultDiv.textContent = 'Incorrecto, ¡inténtalo de nuevo! 😊';
+                resultDiv.style.color = '#FF5722';
+            }
+        }
+
+        // TIEMPO DE REACCIÓN
+        let reactionStartTime = 0;
+        let reactionTimeout = null;
+        let reactionWaiting = false;
+
+        function initReactionGame() {
+            const area = document.getElementById('reaction-area');
+            const result = document.getElementById('reaction-result');
+            
+            area.style.background = 'rgba(255,255,255,0.1)';
+            area.textContent = 'Haz clic para empezar';
+            result.textContent = '';
+            reactionWaiting = false;
+            
+            if (reactionTimeout) {
+                clearTimeout(reactionTimeout);
+                reactionTimeout = null;
+            }
+            
+            area.onclick = startReactionTest;
+        }
+
+        function startReactionTest() {
+            const area = document.getElementById('reaction-area');
+            const result = document.getElementById('reaction-result');
+            
+            if (reactionWaiting) {
+                // Clic muy temprano
+                area.style.background = 'rgba(255,0,0,0.3)';
+                area.textContent = '¡Muy temprano! Haz clic para reintentar';
+                result.textContent = 'Espera a que aparezca el verde';
+                reactionWaiting = false;
+                if (reactionTimeout) clearTimeout(reactionTimeout);
+                area.onclick = startReactionTest;
+                return;
+            }
+            
+            area.style.background = 'rgba(255,255,0,0.3)';
+            area.textContent = 'Espera...';
+            result.textContent = '';
+            reactionWaiting = true;
+            
+            // Tiempo aleatorio entre 1-5 segundos
+            const delay = Math.random() * 4000 + 1000;
+            
+            reactionTimeout = setTimeout(() => {
+                area.style.background = 'rgba(0,255,0,0.5)';
+                area.textContent = '¡AHORA! Haz clic';
+                reactionStartTime = Date.now();
+                area.onclick = measureReaction;
+            }, delay);
+        }
+
+        function measureReaction() {
+            const reactionTime = Date.now() - reactionStartTime;
+            const area = document.getElementById('reaction-area');
+            const result = document.getElementById('reaction-result');
+            
+            area.style.background = 'rgba(255,255,255,0.1)';
+            area.textContent = 'Haz clic para volver a probar';
+            
+            let message = `Tu tiempo: ${reactionTime}ms - `;
+            if (reactionTime < 200) message += '¡Increíble! 🚀';
+            else if (reactionTime < 300) message += '¡Excelente! 🎯';
+            else if (reactionTime < 400) message += '¡Muy bueno! 👍';
+            else if (reactionTime < 500) message += 'Bueno 👌';
+            else message += 'Puedes mejorar 💪';
+            
+            result.textContent = message;
+            reactionWaiting = false;
+            area.onclick = startReactionTest;
+        }
+
+        // Controles de teclado para Snake
+        document.addEventListener('keydown', (e) => {
+            if (currentGame !== 'snake') return;
+            
+            switch(e.key) {
+                case 'ArrowUp': changeDirection('up'); break;
+                case 'ArrowDown': changeDirection('down'); break;
+                case 'ArrowLeft': changeDirection('left'); break;
+                case 'ArrowRight': changeDirection('right'); break;
+            }
+        });
+
+        // Enter para comprobar palabra
+        document.addEventListener('keydown', (e) => {
+            if (currentGame === 'word' && e.key === 'Enter') {
+                checkWord();
+            }
+        });
+
+        // Inicializar la primera vez
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mostrar menú por defecto
+        });
+    </script>
+</body>
+</html>
